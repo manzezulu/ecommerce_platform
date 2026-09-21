@@ -20,7 +20,7 @@ class RegisterForm(forms.Form):
     - username: unique login name.
     - email: unique email address (validated case-insensitively).
     - password / password_confirm: must match.
-    - account_type: "buyer" or "vendor" — determines group membership.
+    - account_type: "buyer" or "vendor" - determines group membership.
     """
 
     ACCOUNT_TYPE_CHOICES = [
@@ -45,7 +45,7 @@ class RegisterForm(forms.Form):
         """Reject emails that are already registered.
 
         Case-insensitive so 'Alice@Example.com' and 'alice@example.com'
-        are treated as the same address — otherwise invoice emailing
+        are treated as the same address - otherwise invoice emailing
         and password resets become ambiguous.
         """
         email = self.cleaned_data["email"].strip().lower()

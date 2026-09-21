@@ -48,7 +48,7 @@ def _ensure_groups_exist():
     """Create the Vendors and Buyers groups the first time they are needed.
 
     Assigning the appropriate Django permissions to each group keeps
-    permission checks centralised — the views just ask whether the
+    permission checks centralised - the views just ask whether the
     current user has, e.g., `store.add_store`.
     """
     vendors, _ = Group.objects.get_or_create(name="Vendors")
@@ -80,8 +80,8 @@ def buyer_required(view_func):
     """Ensure the current user is a logged-in buyer.
 
     Anonymous users are redirected to the login page. Logged-in
-    non-buyers (i.e. vendors) get an error message and are redirected to
-    the product list — they must never be able to add to or view a
+    non-buyers get an error message and are redirected to
+    the product list they must never be able to add to or view a
     cart, or place an order.
     """
     @wraps(view_func)
@@ -251,7 +251,7 @@ def store_delete(request, pk):
 # ---------------------------------------------------------------------------
 
 def product_list(request):
-    """Public product list — anyone (including anonymous users) can browse."""
+    """Public product list - anyone (including anonymous users) can browse."""
     products = Product.objects.select_related("store").all()
     return render(request, "store/product_list.html", {"products": products})
 
@@ -276,7 +276,7 @@ def product_detail(request, pk):
 
 @login_required
 def product_create(request, store_pk):
-    """Add a product to a store — only the owning vendor may do so."""
+    """Add a product to a store - only the owning vendor may do so."""
     store = get_object_or_404(Store, pk=store_pk)
     has_permission = (
         request.user.has_perm("store.add_products")
@@ -300,7 +300,7 @@ def product_create(request, store_pk):
 
 @login_required
 def product_update(request, pk):
-    """Edit a product — only the owning vendor may do so."""
+    """Edit a product - only the owning vendor may do so."""
     product = get_object_or_404(Product, pk=pk)
     has_permission = (
         request.user.has_perm("store.change_products")

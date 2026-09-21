@@ -1,85 +1,228 @@
-# eCommerce Platform
+# Django eCommerce Platform
 
-A Django eCommerce app supporting two account types, **vendors**, who run
-stores and list products, and **buyers**, who browse, purchase, and review
-products.
+A Django eCommerce application where vendors can create stores and manage products, while buyers can browse products, add items to a cart, place orders, and leave reviews.
 
-## Project structure
+## Project Structure
+
+```text
 ecommerce_platform/
 ├── manage.py
-├── requirements.txt (Django, mysqlclient, etc.)
+├── requirements.txt
 ├── .gitignore
 ├── README.md
-├── store/ (the "store" app)
-│ ├── models.py (Store, Product, Order, OrderItem, Review, PasswordResetToken)
-│ ├── forms.py
-│ ├── views.py (auth, stores, products, cart/checkout, reviews, password reset)
-│ ├── urls.py
-│ ├── admin.py
-│ ├── tests.py (automated tests)
-│ ├── templatetags/store_extras.py
-│ ├── migrations/
-│ ├── templates/store/
-│ └── static/store/styles.css
-└── ecommerce_platform/ (project/core app)
-├── settings.py
-├── urls.py
-├── asgi.py
-└── wsgi.py
+│
+├── store/
+│   ├── models.py
+│   ├── forms.py
+│   ├── views.py
+│   ├── urls.py
+│   ├── admin.py
+│   ├── tests.py
+│   ├── migrations/
+│   ├── templates/
+│   │   └── store/
+│   ├── static/
+│   │   └── store/
+│   │       └── styles.css
+│   └── templatetags/
+│       └── store_extras.py
+│
+└── ecommerce_platform/
+    ├── settings.py
+    ├── urls.py
+    ├── asgi.py
+    └── wsgi.py
+```
 
-text
+The following files are not included in the repository:
 
-> **Not in the repository:** the `venv/` folder, `db.sqlite3`, collected
-> static files under `staticfiles/`, and any `.env` file — all are
-> excluded via `.gitignore` and recreated by the setup steps below.
+```text
+venv/
+db.sqlite3
+staticfiles/
+.env
+```
 
----
+These files are excluded using `.gitignore`.
+
+## Features
+
+### User Registration
+
+Users can register as either:
+
+- Buyer
+- Vendor
+
+Users are added to the appropriate Django group during registration.
+
+Email addresses must be unique.
+
+### Vendors
+
+Vendors can:
+
+- Create their own store
+- Edit their store
+- Delete their store
+- Add products
+- Edit their products
+- Delete their products
+
+A vendor can only manage their own store and products.
+
+### Buyers
+
+Buyers can:
+
+- Browse products
+- Add products to their cart
+- Change quantities
+- Remove products from their cart
+- Checkout
+- Leave product reviews
+
+Vendors cannot access the buyer cart and checkout functionality.
+
+### Shopping Cart
+
+The shopping cart uses Django sessions.
+
+The cart checks product stock when items are added.
+
+If stock changes after an item has been added to the cart, the buyer is warned before checkout.
+
+Checkout will not continue if the requested quantity is no longer available.
+
+### Orders
+
+When a buyer checks out:
+
+1. An order is created.
+2. Order items are created.
+3. Product stock is reduced.
+4. The cart is cleared.
+5. An invoice email is generated.
+
+The order keeps the relevant product and price information at the time of purchase.
+
+### Reviews
+
+Logged-in users can review products.
+
+A review is marked as verified when the user has previously purchased the product.
+
+### Password Reset
+
+Users can request a password reset.
+
+The reset link:
+
+- Is sent by email.
+- Expires after 15 minutes.
+- Can only be used once.
+
+The reset token is stored as a hash rather than the original token.
+
+### Django Admin
+
+The application's models are registered with Django Admin.
+
+Administrators can use the Django Admin site to manage the application's data.
+
+## Technologies Used
+
+- Python
+- Django
+- MySQL / MariaDB
+- HTML
+- CSS
+- Django Templates
+- Git
+
+SQLite can also be used for a quick local test.
 
 ## Setup
 
-### 1. Clone the repository
+### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/manzezulu/ecommerce_platform.git
 cd ecommerce_platform
-Replace <your-username> with your GitHub username.
+```
 
-2. Create and activate a virtual environment
-The venv/ folder is created inside the project folder.
+### 2. Create a Virtual Environment
 
-bash
+Windows:
+
+```bash
 python -m venv venv
-source venv/bin/activate 
-3. Install dependencies from requirements.txt
-All required packages (Django, mysqlclient, and their transitive
-dependencies) are listed in requirements.txt. Install them in one
-command:
+venv\Scripts\activate
+```
 
-bash
+Linux/macOS:
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+### 3. Install Dependencies
+
+```bash
 pip install -r requirements.txt
-4. Create the MySQL/MariaDB database
-The project is configured to use MySQL/MariaDB via mysqlclient.
-Before running migrations, create the database itself.
+```
 
-Log into MySQL/MariaDB as root:
+## 4. Create the MySQL Database
 
-bash
+Log into MySQL or MariaDB:
+
+```bash
 mysql -u root -p
-Then run these SQL queries (change the password to something unique):
+```
 
-sql
-CREATE DATABASE ecommerce_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER 'ecommerce_user'@'localhost' IDENTIFIED BY 'your-password-here';
-GRANT ALL PRIVILEGES ON ecommerce_db.* TO 'ecommerce_user'@'localhost';
+Create the database:
+
+```sql
+CREATE DATABASE ecommerce_db
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_unicode_ci;
+```
+
+Create the database user:
+
+```sql
+CREATE USER 'ecommerce_user'@'localhost'
+IDENTIFIED BY 'your-password-here';
+```
+
+Give the user access to the database:
+
+```sql
+GRANT ALL PRIVILEGES
+ON ecommerce_db.*
+TO 'ecommerce_user'@'localhost';
+
 FLUSH PRIVILEGES;
-EXIT;
-Open ecommerce_platform/settings.py and fill in the DATABASES block
-with these credentials. The MySQL/MariaDB engine listens on port
-3306 by default — do not change the port unless you have deliberately
-configured a second instance elsewhere (using e.g. 3307 will cause
-migrate errors).
+```
 
-python
+Then exit:
+
+```sql
+EXIT;
+```
+
+## 5. Configure the Database
+
+Open:
+
+```text
+ecommerce_platform/settings.py
+```
+
+Update the database settings:
+
+```python
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
@@ -90,79 +233,83 @@ DATABASES = {
         "PORT": "3306",
     }
 }
-or you can just use SQLite for a quick smoke test. Uncomment the SQLite 
-lines from the settings.py
+```
 
-5. Apply migrations
-bash
+MySQL/MariaDB normally uses port `3306`.
+
+## 6. Run Migrations
+
+```bash
 python manage.py makemigrations
 python manage.py migrate
-6. Collect static files
-bash
-python manage.py collectstatic
-7. (Optional) create an admin superuser
-bash
+```
+
+## 7. Create an Admin User
+
+```bash
 python manage.py createsuperuser
-8. Run the development server
-bash
+```
+
+Follow the instructions in the terminal.
+
+## 8. Run the Application
+
+```bash
 python manage.py runserver
-Then visit http://127.0.0.1:8000/ to browse the store, or
-http://127.0.0.1:8000/admin/ to manage data through the Django
-admin.
+```
 
-Password-reset and order-invoice emails are printed to the console by
-default (see EMAIL_BACKEND in settings.py) so you can see them
-without configuring a real mail server. To send real emails, uncomment
-and fill in the SMTP block in settings.py.
+Open the application in your browser:
 
+```text
+http://127.0.0.1:8000/
+```
 
-Features implemented
-Registration & roles - users register as a buyer or a vendor;
-registration adds them to a matching Buyers/Vendors Django group,
-which controls their permissions. Email addresses are validated as
-unique (case-insensitively).
+Django Admin:
 
-Stores & products (vendor) - vendors can create, edit, and delete
-their own stores, and add/edit/delete products within them. Every
-management view checks both the relevant Django permission and that
-the current user actually owns the store/product.
+```text
+http://127.0.0.1:8000/admin/
+```
 
-Browsing (public) & cart (buyers only) - anyone can browse
-products; only logged-in buyers can add products to a session-based
-cart, view it, adjust it, and remove items. Vendors cannot access cart
-or checkout functionality.
+## Email
 
-Stock-aware cart, the cart rejects additions that would exceed
-the product's current stock, warns the buyer on the cart page if stock
-has dropped, and aborts checkout with a clear error if any line is no
-longer available (rather than silently reducing the quantity).
+For development, password reset emails and order invoices are printed in the terminal instead of being sent through a real email service.
 
-Checkout - creates an Order with snapshotted OrderItems,
-reduces product stock, clears the cart, and emails the invoice.
+A real SMTP email service can be configured in `settings.py` if required.
 
-Reviews - any logged-in user can review a product; a review is
-automatically marked "verified" if the reviewer has an order
-containing that product.
+## Testing
 
-Forgotten password - a "forgot password" form emails a single-use,
-time-limited (15 minute) reset link; the raw token is never stored,
-only its SHA-1 hash.
+The project includes automated tests for the main functionality.
 
-Admin - every model is registered with the Django admin site.
+Run the tests with:
 
-Testing
-Run the automated test suite (registration, unique-email enforcement,
-group permissions & ownership checks, buyer-only cart access, stock
-enforcement, cart/checkout, invoice emailing, reviews, and password
-reset):
-
-bash
+```bash
 python manage.py test store
+```
 
-Planning
-See the Planning/ folder for the requirements.
+The tests cover:
 
-Notes
-The venv/ folder has been excluded from this submission.
+- User registration
+- Unique email addresses
+- User groups and permissions
+- Store ownership
+- Product ownership
+- Buyer-only cart access
+- Stock checking
+- Cart functionality
+- Checkout
+- Orders
+- Invoice emails
+- Product reviews
+- Password reset
 
-MySQL/MariaDB runs on port 3306 by default
+## Planning
+
+Project requirements and planning documents are available in the `Planning/` folder.
+
+## Author
+
+Manzezulu Mazibuko
+
+GitHub: https://github.com/manzezulu
+
+LinkedIn: https://www.linkedin.com/in/manzezulu-mazibuko-b62a26177/

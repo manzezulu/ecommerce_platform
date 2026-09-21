@@ -63,12 +63,8 @@ WSGI_APPLICATION = "ecommerce_platform.wsgi.application"
 
 
 # --- Database ------------------------------------------------------------
-# SQLite is used by default. To use MySQL/MariaDB, comment out the SQLite
+# SQLite is used by default. To use MariaDB, comment out the SQLite
 # block below, uncomment the MySQL block, and fill in your credentials.
-#
-# Reminder: MySQL/MariaDB listens on port 3306 by default. Using any other
-# port here (e.g. 3307) will cause migrate errors unless you have
-# explicitly configured a second MySQL instance on that port.
 
 DATABASES = {
     "default": {
@@ -113,7 +109,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 # --- Email ---------------------------------------------------------------
-# In development, emails are printed to the console so you can see the
+# For Practical purposesnemails are printed to the console so you can see the
 # invoice and password-reset links without a mail server. Running the
 # server and performing a checkout will print the invoice there.
 
@@ -121,16 +117,14 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 DEFAULT_FROM_EMAIL = "no-reply@starbridge-market.local"
 
 # --- Email (production) --------------------------------------------------
-# Uncomment and fill in to send real emails (e.g. Gmail SMTP, SendGrid,
-# Mailgun). Never commit real credentials — load them from environment
-# variables instead.
+# Uncomment and fill in to send real emails.
 #
 # EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 # EMAIL_HOST = "smtp.gmail.com"
 # EMAIL_PORT = 587
 # EMAIL_USE_TLS = True
-# EMAIL_HOST_USER = "your-address@gmail.com"
-# EMAIL_HOST_PASSWORD = "your-app-password"
+# EMAIL_HOST_USER = "yourcompanyaddress@gmail.com"
+# EMAIL_HOST_PASSWORD = "ecommercepassword"
 # DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 
