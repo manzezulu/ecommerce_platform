@@ -1,0 +1,95 @@
+<svg viewBox="0 0 980 660" width="980" height="660" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif">
+  <rect x="0" y="0" width="980" height="660" fill="#f5f6f8"/>
+  <text x="490" y="32" font-size="20" font-weight="700" fill="#20242b" text-anchor="middle">Sequence Diagram — Checkout</text>
+
+  <g font-size="12.5" fill="#20242b">
+    <rect x="40" y="55" width="80" height="34" rx="6" fill="#ffffff" stroke="#20242b"/>
+    <text x="80" y="77" text-anchor="middle">Buyer</text>
+
+    <rect x="190" y="55" width="90" height="34" rx="6" fill="#ffffff" stroke="#20242b"/>
+    <text x="235" y="77" text-anchor="middle">Browser</text>
+
+    <rect x="355" y="55" width="120" height="34" rx="6" fill="#ffffff" stroke="#20242b"/>
+    <text x="415" y="70" text-anchor="middle">checkout</text>
+    <text x="415" y="84" text-anchor="middle" font-size="11">(views.py)</text>
+
+    <rect x="530" y="55" width="110" height="34" rx="6" fill="#ffffff" stroke="#20242b"/>
+    <text x="585" y="70" text-anchor="middle">Session</text>
+    <text x="585" y="84" text-anchor="middle" font-size="11">(cart)</text>
+
+    <rect x="690" y="55" width="130" height="34" rx="6" fill="#ffffff" stroke="#20242b"/>
+    <text x="755" y="70" text-anchor="middle">Order / Product</text>
+    <text x="755" y="84" text-anchor="middle" font-size="11">(models.py)</text>
+
+    <rect x="870" y="55" width="90" height="34" rx="6" fill="#ffffff" stroke="#20242b"/>
+    <text x="915" y="70" text-anchor="middle">Email</text>
+    <text x="915" y="84" text-anchor="middle" font-size="11">backend</text>
+  </g>
+
+  <g stroke="#9a9fab" stroke-width="1.5" stroke-dasharray="4,3">
+    <line x1="80" y1="89" x2="80" y2="630"/>
+    <line x1="235" y1="89" x2="235" y2="630"/>
+    <line x1="415" y1="89" x2="415" y2="630"/>
+    <line x1="585" y1="89" x2="585" y2="630"/>
+    <line x1="755" y1="89" x2="755" y2="630"/>
+    <line x1="915" y1="89" x2="915" y2="630"/>
+  </g>
+
+  <g font-size="12" fill="#20242b">
+    <line x1="80" y1="118" x2="225" y2="118" stroke="#20242b" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <text x="85" y="112">1. Clicks "Checkout"</text>
+
+    <line x1="235" y1="146" x2="405" y2="146" stroke="#20242b" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <text x="240" y="140">2. POST /checkout/</text>
+
+    <line x1="415" y1="174" x2="575" y2="174" stroke="#20242b" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <text x="420" y="168">3. Read cart {product_id: qty}</text>
+
+    <line x1="585" y1="202" x2="425" y2="202" stroke="#20242b" stroke-width="1.5" stroke-dasharray="6,3" marker-end="url(#arrow)"/>
+    <text x="435" y="196">4. Returns cart contents</text>
+
+    <line x1="415" y1="230" x2="745" y2="230" stroke="#20242b" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <text x="420" y="224">5. Create Order (buyer, total=0)</text>
+
+    <text x="420" y="255" font-size="11" fill="#4a4f5a">For each item in the cart:</text>
+
+    <line x1="415" y1="278" x2="745" y2="278" stroke="#20242b" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <text x="420" y="272">6. Create OrderItem (qty, price snapshot)</text>
+
+    <line x1="415" y1="306" x2="745" y2="306" stroke="#20242b" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <text x="420" y="300">7. Reduce Product.stock &amp; save</text>
+
+    <line x1="415" y1="334" x2="745" y2="334" stroke="#20242b" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <text x="420" y="328">8. Save Order.total</text>
+
+    <line x1="415" y1="362" x2="575" y2="362" stroke="#20242b" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <text x="420" y="356">9. Clear cart ({})</text>
+
+    <line x1="415" y1="392" x2="905" y2="392" stroke="#20242b" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <text x="420" y="386">10. Send invoice email (order summary, total)</text>
+
+    <line x1="915" y1="420" x2="425" y2="420" stroke="#20242b" stroke-width="1.5" stroke-dasharray="6,3" marker-end="url(#arrow)"/>
+    <text x="440" y="414">11. Email queued/sent</text>
+
+    <line x1="415" y1="450" x2="245" y2="450" stroke="#20242b" stroke-width="1.5" stroke-dasharray="6,3" marker-end="url(#arrow)"/>
+    <text x="255" y="444">12. HTTP 302 redirect to /orders/&lt;id&gt;/</text>
+
+    <line x1="235" y1="480" x2="405" y2="480" stroke="#20242b" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <text x="240" y="474">13. GET /orders/&lt;id&gt;/</text>
+
+    <line x1="415" y1="508" x2="245" y2="508" stroke="#20242b" stroke-width="1.5" stroke-dasharray="6,3" marker-end="url(#arrow)"/>
+    <text x="255" y="502">14. Renders order_detail.html (200 OK)</text>
+
+    <line x1="235" y1="538" x2="90" y2="538" stroke="#20242b" stroke-width="1.5" stroke-dasharray="6,3" marker-end="url(#arrow)"/>
+    <text x="95" y="532">15. Displays invoice / order summary</text>
+  </g>
+
+  <text x="80" y="580" font-size="11" fill="#4a4f5a">Note: if a cart product's saved quantity exceeds current stock, step 7</text>
+  <text x="80" y="596" font-size="11" fill="#4a4f5a">caps the purchased quantity at the available stock rather than overselling.</text>
+
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#20242b"/>
+    </marker>
+  </defs>
+</svg>

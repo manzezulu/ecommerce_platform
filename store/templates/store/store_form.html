@@ -1,0 +1,14 @@
+{% extends 'store/base.html' %}
+{% block title %}
+  {% if form.instance.pk %}Edit store{% else %}New store{% endif %}
+{% endblock %}
+{% block content %}
+  <h2 class="page-heading">
+    {% if form.instance.pk %}Edit store{% else %}New store{% endif %}
+  </h2>
+  <form method="post" class="form-card">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn">Save store</button>
+  </form>
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends 'store/base.html' %}
+{% load store_extras %}
+{% block title %}{{ product.name }}{% endblock %}
+{% block content %}
+  <article class="product-detail">
+    <h2>{{ product.name }}</h2>
+    <p class="product-store">
+      Sold by <a href="{% url 'store_detail' pk=product.store.pk %}">{{ product.store.name }}</a>
+    </p>
+    <p>{{ product.description }}</p>
+    <p class="product-price">R{{ product.price }}</p>
+    <p class="product-stock">
+      {% if product.stock > 0 %}{{ product.stock }} in stock{% else %}Out of stock{% endif %}
+    </p>
+
+    {% if user.is_authenticated and user|has_group:"Buyers" and product.stock > 0 %}
+      <p class="stock-hint">Maximum you can order: {{ product.stock }}</p>
+      <form method="post" action="{% url 'add_to_cart' pk=product.pk %}" class="inline-form">
+        {% csrf_token %}
+        {{ add_to_cart_form.as_p }}
+        <div class="card-actions">
+          <button type="submit" class="btn">Add to cart</button>
+          <a href="#leave-review" class="btn btn-secondary">Leave a review</a>
+        </div>
+      </form>
+    {% elif not user.is_authenticated %}
+      <p><a href="{% url 'login' %}">Log in</a> to purchase this product.</p>
+    {% endif %}
+
+    {% if product.store.owner_id == user.id %}
+      <div class="owner-actions">
+        <a href="{% url 'product_update' pk=product.pk %}" class="btn btn-secondary">Edit product</a>
+        <a href="{% url 'product_delete' pk=product.pk %}" class="btn btn-danger">Delete product</a>
+      </div>
+    {% endif %}
+  </article>
+
+  <section class="reviews" id="leave-review">
+    <h3>Reviews</h3>
+    {% if reviews %}
+      <ul class="review-list">
+        {% for review in reviews %}
+          <li class="review {% if review.verified %}verified{% endif %}">
+            <strong>{{ review.user.username }}</strong>  {{ review.rating }}/5
+            {% if review.verified %}
+              <span class="badge">Verified purchase</span>
+            {% else %}
+              <span class="badge badge-muted">Unverified</span>
+            {% endif %}
+            <p>{{ review.comment }}</p>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="empty-state">No reviews yet.</p>
+    {% endif %}
+
+    {% if user.is_authenticated %}
+      <h4>Leave a review</h4>
+      <form method="post" action="{% url 'leave_review' pk=product.pk %}">
+        {% csrf_token %}
+        {{ review_form.as_p }}
+        <button type="submit" class="btn">Submit review</button>
+      </form>
+    {% endif %}
+  </section>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends 'store/base.html' %}
+{% block title %}Order #{{ order.pk }}{% endblock %}
+{% block content %}
+  <h2 class="page-heading">Order #{{ order.pk }}</h2>
+  <p>Placed on {{ order.created_at|date:"d M Y, H:i" }}</p>
+  <table class="cart-table">
+    <tr><th>Product</th><th>Quantity</th><th>Price</th><th>Line total</th></tr>
+    {% for item in order.items.all %}
+      <tr>
+        <td>{{ item.product_name }}</td>
+        <td>{{ item.quantity }}</td>
+        <td>R{{ item.price_at_purchase }}</td>
+        <td>R{{ item.line_total }}</td>
+      </tr>
+    {% endfor %}
+    <tr class="cart-total-row">
+      <td colspan="3"><strong>Total</strong></td>
+      <td><strong>R{{ order.total }}</strong></td>
+    </tr>
+  </table>
+
+  {% if order.buyer.email %}
+    <p class="empty-state">A copy of this invoice has been emailed to you.</p>
+  {% else %}
+    <p class="empty-state">
+      No email address is on file for your account, so the invoice could
+      not be emailed. Contact support if you need a copy.
+    </p>
+  {% endif %}
+{% endblock %}

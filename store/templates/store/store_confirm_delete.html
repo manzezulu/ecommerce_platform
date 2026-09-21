@@ -1,0 +1,11 @@
+{% extends 'store/base.html' %}
+{% block title %}Delete {{ store.name }}{% endblock %}
+{% block content %}
+  <h2 class="page-heading">Delete store</h2>
+  <p>Are you sure you want to delete <strong>{{ store.name }}</strong> and all of its products? This cannot be undone.</p>
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Yes, delete it</button>
+    <a href="{% url 'store_detail' pk=store.pk %}" class="btn btn-secondary">Cancel</a>
+  </form>
+{% endblock %}

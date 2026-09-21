@@ -1,0 +1,17 @@
+{% extends 'store/base.html' %}
+{% block title %}My stores{% endblock %}
+{% block content %}
+  <div class="page-header-row">
+    <h2 class="page-heading">My stores</h2>
+    <a href="{% url 'store_create' %}" class="btn"> + New store</a>
+  </div>
+  {% if stores %}
+    <ul class="store-list">
+      {% for store in stores %}
+        <li><a href="{% url 'store_detail' pk=store.pk %}">{{ store.name }}</a> {{ store.products.count }} product(s)</li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="empty-state">You haven't created a store yet. <a href="{% url 'store_create' %}">Create one</a>.</p>
+  {% endif %}
+{% endblock %}

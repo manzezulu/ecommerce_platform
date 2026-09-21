@@ -1,0 +1,50 @@
+<!-- store/templates/store/base.html -->
+{% load static %}
+{% load store_extras %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Malizahloso Starbridge Market{% endblock title %}</title>
+    <link rel="stylesheet" href="{% static 'store/styles.css' %}" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a href="{% url 'product_list' %}" class="site-title">Malizahloso Starbridge Market</a>
+      <nav>
+        <a href="{% url 'product_list' %}">Browse</a>
+        {% if user.is_authenticated %}
+          {% if user|has_group:"Buyers" %}
+            <a href="{% url 'view_cart' %}">Cart</a>
+          {% endif %}
+          {% if user|has_group:"Vendors" %}
+            <a href="{% url 'my_stores' %}">My Stores</a>
+          {% endif %}
+          <span class="nav-user">Hi, {{ user.username }}</span>
+          <a href="{% url 'logout' %}">Log out</a>
+        {% else %}
+          <a href="{% url 'login' %}">Log in</a>
+          <a href="{% url 'register' %}">Register</a>
+        {% endif %}
+      </nav>
+    </header>
+
+    {% if messages %}
+      <ul class="messages">
+        {% for message in messages %}
+          <li class="message {{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    <main>
+      {% block content %}
+      {% endblock content %}
+    </main>
+
+    <footer class="site-footer">
+      <p>Malizahloso Starbridge Market.</p>
+    </footer>
+  </body>
+</html>

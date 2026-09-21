@@ -1,0 +1,37 @@
+{% extends 'store/base.html' %}
+{% block title %}{{ store.name }}{% endblock %}
+{% block content %}
+  <div class="page-header-row">
+    <h2 class="page-heading">{{ store.name }}</h2>
+    {% if is_owner %}
+      <div class="owner-actions">
+        <a href="{% url 'store_update' pk=store.pk %}" class="btn btn-secondary">Edit store</a>
+        <a href="{% url 'store_delete' pk=store.pk %}" class="btn btn-danger">Delete store</a>
+      </div>
+    {% endif %}
+  </div>
+  <p>{{ store.description }}</p>
+
+  <div class="page-header-row">
+    <h3>Products</h3>
+    {% if is_owner %}
+      <a href="{% url 'product_create' store_pk=store.pk %}" class="btn">+ Add product</a>
+    {% endif %}
+  </div>
+
+  {% if products %}
+    <div class="product-grid">
+      {% for product in products %}
+        <article class="product-card">
+          <a href="{% url 'product_detail' pk=product.pk %}"><h3>{{ product.name }}</h3></a>
+          <p class="product-price">R{{ product.price }}</p>
+          <p class="product-stock">
+            {% if product.stock > 0 %}{{ product.stock }} in stock{% else %}Out of stock{% endif %}
+          </p>
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="empty-state">This store doesn't have any products yet.</p>
+  {% endif %}
+{% endblock %}

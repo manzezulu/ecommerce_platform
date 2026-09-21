@@ -1,0 +1,49 @@
+{% extends 'store/base.html' %}
+{% block title %}Your cart{% endblock %}
+{% block content %}
+  <h2 class="page-heading">Your cart</h2>
+  {% if items %}
+    {% if has_issue %}
+      <p class="message error">
+        One or more items exceed available stock. Please adjust quantities
+        (or remove the item) before checking out.
+      </p>
+    {% endif %}
+
+    <table class="cart-table">
+      <tr>
+        <th>Product</th><th>Quantity</th><th>Line total</th><th></th>
+      </tr>
+      {% for row in items %}
+        <tr {% if row.over_stock %}class="over-stock"{% endif %}>
+          <td><a href="{% url 'product_detail' pk=row.product.pk %}">{{ row.product.name }}</a></td>
+          <td>
+            {{ row.quantity }}
+            {% if row.over_stock %}
+              <small class="error-text">only {{ row.product.stock }} in stock</small>
+            {% endif %}
+          </td>
+          <td>R{{ row.line_total }}</td>
+          <td><a href="{% url 'remove_from_cart' pk=row.product.pk %}">Remove</a></td>
+        </tr>
+      {% endfor %}
+      <tr class="cart-total-row">
+        <td colspan="2"><strong>Total</strong></td>
+        <td colspan="2"><strong>R{{ total }}</strong></td>
+      </tr>
+    </table>
+
+    {% if has_issue %}
+      <button type="button" class="btn" disabled>Checkout</button>
+    {% else %}
+      <form method="post" action="{% url 'checkout' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn">Checkout</button>
+      </form>
+    {% endif %}
+  {% else %}
+    <p class="empty-state">
+      Your cart is empty. <a href="{% url 'product_list' %}">Browse products</a>.
+    </p>
+  {% endif %}
+{% endblock %}

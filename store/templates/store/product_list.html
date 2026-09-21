@@ -1,0 +1,33 @@
+{% extends 'store/base.html' %}
+{% load store_extras %}
+{% block title %}Browse products{% endblock %}
+{% block content %}
+  <h2 class="page-heading">All products</h2>
+  {% if products %}
+    <div class="product-grid">
+      {% for product in products %}
+        <article class="product-card">
+          <a href="{% url 'product_detail' pk=product.pk %}"><h3>{{ product.name }}</h3></a>
+          <p class="product-store">{{ product.store.name }}</p>
+          <p class="product-price">R{{ product.price }}</p>
+          <p class="product-stock">
+            {% if product.stock > 0 %}{{ product.stock }} in stock{% else %}Out of stock{% endif %}
+          </p>
+
+          <div class="card-actions">
+            <a href="{% url 'product_detail' pk=product.pk %}" class="btn">View / Buy</a>
+            {% if user.is_authenticated and user|has_group:"Buyers" and product.stock > 0 %}
+              <form method="post" action="{% url 'add_to_cart' pk=product.pk %}" class="card-cart-form">
+                {% csrf_token %}
+                <input type="hidden" name="quantity" value="1" />
+                <button type="submit" class="btn btn-secondary">Add to cart</button>
+              </form>
+            {% endif %}
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="empty-state">No products have been listed yet.</p>
+  {% endif %}
+{% endblock %}

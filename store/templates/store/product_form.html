@@ -1,0 +1,15 @@
+{% extends 'store/base.html' %}
+{% block title %}
+  {% if form.instance.pk %}Edit product{% else %}New product{% endif %}
+{% endblock %}
+{% block content %}
+  <h2 class="page-heading">
+    {% if form.instance.pk %}Edit product{% else %}New product in {{ store.name }}{% endif %}
+  </h2>
+  <form method="post" class="form-card">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn">Save product</button>
+    <a href="{% url 'store_detail' pk=store.pk %}" class="btn btn-secondary">Cancel</a>
+  </form>
+{% endblock %}
