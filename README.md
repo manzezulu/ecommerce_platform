@@ -312,4 +312,8 @@ Manzezulu Mazibuko
 
 GitHub: https://github.com/manzezulu
 
+<<<<<<< HEAD
 LinkedIn: https://www.linkedin.com/in/manzezulu-mazibuko-b62a26177/
+=======
+LinkedIn: https://www.linkedin.com/in/manzezulu-mazibuko-b62a26177/
+>>>>>>> 8da242ed14c57e404ddc62abe5ea09c5290f2bf2
