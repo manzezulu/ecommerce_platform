@@ -66,23 +66,22 @@ WSGI_APPLICATION = "ecommerce_platform.wsgi.application"
 # SQLite is used by default. To use MariaDB, comment out the SQLite
 # block below, uncomment the MySQL block, and fill in your credentials.
 
+#DATABASES = {
+ #   "default": {
+  #      "ENGINE": "django.db.backends.sqlite3",
+   #     "NAME": BASE_DIR / "db.sqlite3",
+    #}
+#}
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
-}
-
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.mysql",
-#         "NAME": "ecommerce_db",
-#         "USER": "ecommerce_user",
-#         "PASSWORD": "your-password-here",
-#         "HOST": "127.0.0.1",
-#         "PORT": "3306",   # default MySQL/MariaDB port
-#     }
-# }
+         "default": {
+         "ENGINE": "django.db.backends.mysql",
+         "NAME": "ecommerse_db",
+         "USER": "ecom_user",
+         "PASSWORD": "123Rain@3",
+         "HOST": "127.0.0.1",
+         "PORT": "3306",   # default MySQL/MariaDB port
+     }
+ }
 
 
 # --- Password validation -------------------------------------------------
