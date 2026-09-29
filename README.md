@@ -1,12 +1,8 @@
 # Django eCommerce Platform
 
-A Django eCommerce application where vendors can create stores and manage
-products, while buyers can browse products, add items to a cart, place
-orders, and leave reviews.
+A Django eCommerce application where vendors can create stores and manage products, while buyers can browse products, add items to a cart, place orders, and leave reviews.
 
-The project also exposes a **RESTful API** for stores, products, and
-reviews, and integrates with the **GitHub Events API** as a third-party
-data source to display recent public activity.
+The project also provides a **RESTful API** for stores, products, and reviews. It also integrates with the **GitHub Events API** as a third-party data source to display recent public activity.
 
 ## Project Structure
 
@@ -24,23 +20,27 @@ ecommerce_platform/
 │   ├── models.py
 │   ├── forms.py
 │   ├── views.py
-│   ├── api_views.py            # REST API views
-│   ├── serializers.py          # DRF serializers
+│   ├── api_views.py
+│   ├── serializers.py
 │   ├── urls.py
 │   ├── admin.py
 │   ├── tests.py
 │   ├── migrations/
+│   │
 │   ├── functions/
 │   │   ├── __init__.py
-│   │   └── reddit.py           # Third-party API helper (GitHub)
+│   │   └── reddit.py
+│   │
 │   ├── templates/
 │   │   └── store/
 │   │       ├── base.html
 │   │       ├── reddit_feed.html
-│   │       └── ... (other templates)
+│   │       └── ... other templates
+│   │
 │   ├── static/
 │   │   └── store/
 │   │       └── styles.css
+│   │
 │   └── templatetags/
 │       └── store_extras.py
 │
@@ -51,7 +51,7 @@ ecommerce_platform/
     └── wsgi.py
 ```
 
-The following files are not included in the repository:
+The following files and directories are not included in the repository:
 
 ```text
 venv/
@@ -62,6 +62,8 @@ staticfiles/
 
 These files are excluded using `.gitignore`.
 
+---
+
 ## Features
 
 ### User Registration
@@ -71,7 +73,7 @@ Users can register as either:
 - Buyer
 - Vendor
 
-Users are added to the appropriate Django group during registration.
+Users are automatically added to the appropriate Django group during registration.
 
 Email addresses must be unique.
 
@@ -94,12 +96,12 @@ Buyers can:
 
 - Browse products
 - Add products to their cart
-- Change quantities
+- Change product quantities
 - Remove products from their cart
 - Checkout
 - Leave product reviews
 
-Vendors cannot access the buyer cart and checkout functionality.
+Vendors cannot access buyer cart and checkout functionality.
 
 ### Shopping Cart
 
@@ -121,7 +123,7 @@ When a buyer checks out:
 4. The cart is cleared.
 5. An invoice email is generated.
 
-The order keeps the relevant product and price information at the time of purchase.
+The order keeps the relevant product and price information from the time of purchase.
 
 ### Reviews
 
@@ -145,74 +147,130 @@ The reset token is stored as a hash rather than the original token.
 
 The application's models are registered with Django Admin.
 
-### REST API
-The project exposes a RESTful API built with the Django REST
-Framework (DRF). The API supports both JSON and XML content
-negotiation.
+---
 
-Read endpoints are public. Write endpoints require
-authentication using HTTP Basic Auth (or session auth when
-accessing the DRF browsable API in the browser) and enforce
-ownership rules - vendors can only create stores for themselves
-and only add products to their own stores.
+## REST API
+
+The project exposes a RESTful API built with the **Django REST Framework (DRF)**.
+
+The API supports both **JSON and XML** content negotiation.
+
+Read endpoints are publicly accessible.
+
+Write endpoints require authentication using **HTTP Basic Authentication**. Session authentication is also available when using the DRF browsable API in a browser.
+
+Ownership rules are enforced for vendor operations. Vendors can only create stores for themselves and can only add products to stores they own.
 
 ### API Endpoints
-Method	URL	Auth	Purpose
-GET	/api/stores/	No	List all stores (with products)
-POST	/api/stores/	Yes (vendor)	Create a new store
-GET	/api/stores/<id>/	No	Retrieve one store
-GET	/api/stores/<id>/products/	No	List products in a store
-POST	/api/stores/<id>/products/	Yes (owner)	Add a product to a store
-GET	/api/products/<id>/	No	Retrieve one product
-GET	/api/products/<id>/reviews/	No	List reviews for a product
-GET	/api/stores.xml/	No	Store list rendered as XML
-Example: create a store (Basic Auth)
-bash
+
+| Method | Endpoint | Authentication | Purpose |
+|---|---|---|---|
+| GET | `/api/stores/` | No | List all stores with products |
+| POST | `/api/stores/` | Yes - Vendor | Create a new store |
+| GET | `/api/stores/<id>/` | No | Retrieve a single store |
+| GET | `/api/stores/<id>/products/` | No | List products in a store |
+| POST | `/api/stores/<id>/products/` | Yes - Owner | Add a product to a store |
+| GET | `/api/products/<id>/` | No | Retrieve a single product |
+| GET | `/api/products/<id>/reviews/` | No | List reviews for a product |
+| GET | `/api/stores.xml/` | No | Retrieve store list as XML |
+
+### Example: Create a Store
+
+A vendor can create a store using HTTP Basic Authentication:
+
+```bash
 curl -u vendor_username:vendor_password \
      -X POST http://127.0.0.1:8000/api/stores/ \
      -H "Content-Type: application/json" \
      -d '{"name": "My API Store", "description": "Created via the API"}'
-Example: add a product to your own store
-bash
+```
+
+### Example: Add a Product
+
+A vendor can add a product to their own store:
+
+```bash
 curl -u vendor_username:vendor_password \
      -X POST http://127.0.0.1:8000/api/stores/1/products/ \
      -H "Content-Type: application/json" \
-     -d '{"name": "API Widget", "description": "From the API",
-          "price": "12.50", "stock": 10}'
-Attempting to add a product to someone else's store returns
-403 Forbidden.
+     -d '{"name": "API Widget", "description": "From the API", "price": "12.50", "stock": 10}'
+```
 
-The DRF browsable API is available at any of the GET endpoints,
-which makes it easy to explore the API from a browser.
+Attempting to add a product to another vendor's store returns:
 
-### Third-Party API - GitHub Events Feed
-The project integrates with the GitHub Events API to display
-recent public activity on GitHub.
+```text
+403 Forbidden
+```
 
-Visit /reddit/ to see recent GitHub events.
+The DRF browsable API is available through the GET endpoints, making it possible to explore the API directly from a browser.
 
-Data is fetched by a helper function in store/functions/reddit.py.
+---
 
-The helper sends a GET request with a descriptive User-Agent
-and parses the JSON response.
+## Third-Party API - GitHub Events
 
-Only the event title, actor, and a link to the repository are
-displayed.
+The project integrates with the **GitHub Events API** to display recent public activity on GitHub.
 
-### Discovered during development 
-The task originally suggested using
-Reddit's public JSON endpoints. However i came accross an article that states, 
-as of 2026 Reddit has closed anonymous access to both its .json and .rss feeds, 
-returning HTTP 403 unless an OAuth token is supplied. To keep the
-third-party-integration exercise functional without requiring OAuth
-credentials, I used GitHub's public Events API,
-which follows the exact same pattern.
+Visit:
 
-To change the data source in future, edit the call in
-store/views.py:
+```text
+/reddit/
+```
 
-python
+to view recent GitHub events.
+
+The API integration is handled by:
+
+```text
+store/functions/reddit.py
+```
+
+The helper function:
+
+1. Sends a GET request to the external API.
+2. Provides a descriptive `User-Agent`.
+3. Parses the JSON response.
+4. Extracts the relevant event information.
+5. Displays the event title, actor, and repository link.
+
+### Why GitHub Instead of Reddit?
+
+The original task suggested using Reddit's public JSON endpoints.
+
+During development, it was found that Reddit's anonymous `.json` and `.rss` feeds are no longer suitable for this implementation without OAuth authentication.
+
+To keep the third-party API integration functional without requiring OAuth credentials, the project uses GitHub's public Events API instead.
+
+The integration follows the same general pattern:
+
+```text
+Application
+     |
+     v
+Third-Party API
+     |
+     v
+JSON Response
+     |
+     v
+Data Processing
+     |
+     v
+Django Template
+```
+
+The data source can be changed in the future by updating the API call in:
+
+```text
+store/views.py
+```
+
+For example:
+
+```python
 posts = get_reddit_posts("github")
+```
+
+---
 
 ## Technologies Used
 
@@ -220,17 +278,20 @@ posts = get_reddit_posts("github")
 - Django
 - Django REST Framework
 - djangorestframework-xml
-- Requests (for third party API calls)
-- Certifi (for SSL certificate verification)
+- Requests
+- Certifi
 - MySQL / MariaDB
+- SQLite
 - HTML
 - CSS
 - Django Templates
 - Git
 
-SQLite can also be used for a quick local test.
+SQLite can also be used for quick local testing.
 
-## Setup
+---
+
+## Installation and Setup
 
 ### 1. Clone the Repository
 
@@ -241,14 +302,14 @@ cd ecommerce_platform
 
 ### 2. Create a Virtual Environment
 
-Windows:
+#### Windows
 
 ```bash
 python -m venv venv
 venv\Scripts\activate
 ```
 
-Linux/macOS:
+#### Linux / macOS
 
 ```bash
 python3 -m venv venv
@@ -261,7 +322,11 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-## 4. Create the MySQL Database
+---
+
+## Database Setup
+
+### 4. Create the MySQL Database
 
 Log into MySQL or MariaDB:
 
@@ -284,7 +349,7 @@ CREATE USER 'ecommerce_user'@'localhost'
 IDENTIFIED BY 'your-password-here';
 ```
 
-Give the user access to the database:
+Grant the user access to the database:
 
 ```sql
 GRANT ALL PRIVILEGES
@@ -294,13 +359,17 @@ TO 'ecommerce_user'@'localhost';
 FLUSH PRIVILEGES;
 ```
 
-Then exit:
+Exit MySQL:
 
 ```sql
 EXIT;
 ```
 
-## 5. Configure the Database
+---
+
+## Configure the Database
+
+### 5. Update Django Settings
 
 Open:
 
@@ -308,7 +377,7 @@ Open:
 ecommerce_platform/settings.py
 ```
 
-Update the database settings:
+Update the database configuration:
 
 ```python
 DATABASES = {
@@ -323,24 +392,28 @@ DATABASES = {
 }
 ```
 
-MySQL/MariaDB normally uses port `3306`.
+MySQL and MariaDB normally use port `3306`.
 
-## 6. Run Migrations
+---
+
+## Run the Application
+
+### 6. Run Migrations
 
 ```bash
 python manage.py makemigrations
 python manage.py migrate
 ```
 
-## 7. Create an Admin User
+### 7. Create an Admin User
 
 ```bash
 python manage.py createsuperuser
 ```
 
-Follow the instructions in the terminal.
+Follow the instructions displayed in the terminal.
 
-## 8. Run the Application
+### 8. Start the Development Server
 
 ```bash
 python manage.py runserver
@@ -358,17 +431,21 @@ Django Admin:
 http://127.0.0.1:8000/admin/
 ```
 
-## Email
+---
+
+## Email Configuration
 
 For development, password reset emails and order invoices are printed in the terminal instead of being sent through a real email service.
 
 A real SMTP email service can be configured in `settings.py` if required.
 
+---
+
 ## Testing
 
-The project includes automated tests for the main functionality.
+The project includes automated tests covering the main functionality.
 
-Run the tests with:
+Run the test suite with:
 
 ```bash
 python manage.py test store
@@ -390,33 +467,86 @@ The tests cover:
 - Product reviews
 - Password reset
 
-### API Testing
-The API endpoints can be tested with:
+---
 
-Postman - recommended for authenticated POST requests.
+## API Testing
 
-For authenticated requests, use HTTP Basic Auth with a vendor's
-username and password.
+The REST API can be tested using tools such as **Postman**.
 
-SSL / Certificates
-If requests raises SSLCertVerificationError when calling external
-APIs, install/upgrade certifi and pass its bundle explicitly:
+For authenticated requests, use **HTTP Basic Authentication** with a vendor's username and password.
 
-python
+Example:
+
+```text
+Authentication Type: Basic Auth
+
+Username: vendor_username
+Password: vendor_password
+```
+
+---
+
+## SSL Certificates
+
+If an SSL certificate error occurs when making requests to an external API, such as:
+
+```text
+SSLCertVerificationError
+```
+
+install or upgrade `certifi`:
+
+```bash
+pip install --upgrade certifi
+```
+
+The certificate bundle can then be explicitly provided to `requests`:
+
+```python
 import certifi
 import requests
 
-response = requests.get(url, headers=headers, verify=certifi.where())
-The helper in store/functions/reddit.py already does this.
+response = requests.get(
+    url,
+    headers=headers,
+    verify=certifi.where()
+)
+```
+
+The helper in:
+
+```text
+store/functions/reddit.py
+```
+
+already uses this approach.
+
+---
 
 ## Planning
 
-Project requirements and planning documents are available in the `Planning/` folder.
+Project requirements and planning documents are available in the:
+
+```text
+Planning/
+```
+
+directory.
+
+The project also includes a sequence diagram:
+
+```text
+docs/sequence_diagram.png
+```
+
+---
 
 ## Author
 
-Manzezulu Mazibuko
+**Manzezulu Mazibuko**
 
-GitHub: https://github.com/manzezulu
+GitHub:  
+https://github.com/manzezulu
 
-LinkedIn: https://www.linkedin.com/in/manzezulu-mazibuko-b62a26177/
+LinkedIn:  
+https://www.linkedin.com/in/manzezulu-mazibuko-b62a26177/
