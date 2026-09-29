@@ -649,14 +649,20 @@ def reset_password(request, token):
     return render(request, "store/reset_password.html", {"form": form})
 
 # ---------------------------------------------------------------------------
-# Third-party API: Reddit feed (Part 2)
+# Third-party API: Reddit feed (Part 2) we using gitub events api as a 
+# stand-in for reddit feed as reddit no longer provides a public API 
+# for fetching posts without authentication.
 # ---------------------------------------------------------------------------
 
 
 def reddit_feed(request):
-    """Fetch posts from a subreddit and render them in a template."""
-    posts = get_reddit_posts("movies")  
+    """Fetch posts from github events and render them in a template."""
+    posts = get_reddit_posts("github")
     if posts is None:
-        messages.error(request, "Could not fetch posts from Reddit right now.")
+        messages.error(request, "Could not fetch posts from GitHub right now.")
         posts = []
-    return render(request, "store/reddit_feed.html", {"posts": posts, "subreddit": "movies"})
+    return render(
+        request,
+        "store/reddit_feed.html",
+        {"posts": posts, "subreddit": "github"},
+    )

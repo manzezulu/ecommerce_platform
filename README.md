@@ -1,6 +1,12 @@
 # Django eCommerce Platform
 
-A Django eCommerce application where vendors can create stores and manage products, while buyers can browse products, add items to a cart, place orders, and leave reviews.
+A Django eCommerce application where vendors can create stores and manage
+products, while buyers can browse products, add items to a cart, place
+orders, and leave reviews.
+
+The project also exposes a **RESTful API** for stores, products, and
+reviews, and integrates with the **GitHub Events API** as a third-party
+data source to display recent public activity.
 
 ## Project Structure
 
@@ -11,16 +17,27 @@ ecommerce_platform/
 ├── .gitignore
 ├── README.md
 │
+├── docs/
+│   └── sequence_diagram.png
+│
 ├── store/
 │   ├── models.py
 │   ├── forms.py
 │   ├── views.py
+│   ├── api_views.py            # REST API views
+│   ├── serializers.py          # DRF serializers
 │   ├── urls.py
 │   ├── admin.py
 │   ├── tests.py
 │   ├── migrations/
+│   ├── functions/
+│   │   ├── __init__.py
+│   │   └── reddit.py           # Third-party API helper (GitHub)
 │   ├── templates/
 │   │   └── store/
+│   │       ├── base.html
+│   │       ├── reddit_feed.html
+│   │       └── ... (other templates)
 │   ├── static/
 │   │   └── store/
 │   │       └── styles.css
@@ -128,12 +145,83 @@ The reset token is stored as a hash rather than the original token.
 
 The application's models are registered with Django Admin.
 
-Administrators can use the Django Admin site to manage the application's data.
+### REST API
+The project exposes a RESTful API built with the Django REST
+Framework (DRF). The API supports both JSON and XML content
+negotiation.
+
+Read endpoints are public. Write endpoints require
+authentication using HTTP Basic Auth (or session auth when
+accessing the DRF browsable API in the browser) and enforce
+ownership rules - vendors can only create stores for themselves
+and only add products to their own stores.
+
+### API Endpoints
+Method	URL	Auth	Purpose
+GET	/api/stores/	No	List all stores (with products)
+POST	/api/stores/	Yes (vendor)	Create a new store
+GET	/api/stores/<id>/	No	Retrieve one store
+GET	/api/stores/<id>/products/	No	List products in a store
+POST	/api/stores/<id>/products/	Yes (owner)	Add a product to a store
+GET	/api/products/<id>/	No	Retrieve one product
+GET	/api/products/<id>/reviews/	No	List reviews for a product
+GET	/api/stores.xml/	No	Store list rendered as XML
+Example: create a store (Basic Auth)
+bash
+curl -u vendor_username:vendor_password \
+     -X POST http://127.0.0.1:8000/api/stores/ \
+     -H "Content-Type: application/json" \
+     -d '{"name": "My API Store", "description": "Created via the API"}'
+Example: add a product to your own store
+bash
+curl -u vendor_username:vendor_password \
+     -X POST http://127.0.0.1:8000/api/stores/1/products/ \
+     -H "Content-Type: application/json" \
+     -d '{"name": "API Widget", "description": "From the API",
+          "price": "12.50", "stock": 10}'
+Attempting to add a product to someone else's store returns
+403 Forbidden.
+
+The DRF browsable API is available at any of the GET endpoints,
+which makes it easy to explore the API from a browser.
+
+### Third-Party API - GitHub Events Feed
+The project integrates with the GitHub Events API to display
+recent public activity on GitHub.
+
+Visit /reddit/ to see recent GitHub events.
+
+Data is fetched by a helper function in store/functions/reddit.py.
+
+The helper sends a GET request with a descriptive User-Agent
+and parses the JSON response.
+
+Only the event title, actor, and a link to the repository are
+displayed.
+
+### Discovered during development 
+The task originally suggested using
+Reddit's public JSON endpoints. However i came accross an article that states, 
+as of 2026 Reddit has closed anonymous access to both its .json and .rss feeds, 
+returning HTTP 403 unless an OAuth token is supplied. To keep the
+third-party-integration exercise functional without requiring OAuth
+credentials, I used GitHub's public Events API,
+which follows the exact same pattern.
+
+To change the data source in future, edit the call in
+store/views.py:
+
+python
+posts = get_reddit_posts("github")
 
 ## Technologies Used
 
 - Python
 - Django
+- Django REST Framework
+- djangorestframework-xml
+- Requests (for third party API calls)
+- Certifi (for SSL certificate verification)
 - MySQL / MariaDB
 - HTML
 - CSS
@@ -301,6 +389,25 @@ The tests cover:
 - Invoice emails
 - Product reviews
 - Password reset
+
+### API Testing
+The API endpoints can be tested with:
+
+Postman - recommended for authenticated POST requests.
+
+For authenticated requests, use HTTP Basic Auth with a vendor's
+username and password.
+
+SSL / Certificates
+If requests raises SSLCertVerificationError when calling external
+APIs, install/upgrade certifi and pass its bundle explicitly:
+
+python
+import certifi
+import requests
+
+response = requests.get(url, headers=headers, verify=certifi.where())
+The helper in store/functions/reddit.py already does this.
 
 ## Planning
 

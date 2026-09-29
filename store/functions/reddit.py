@@ -1,40 +1,53 @@
 # store/functions/reddit.py
 """
-Helper for fetching posts from Reddit's public JSON endpoint.
+Helper for fetching recent public activity from GitHub's Events API.
+
+GitHub's public events endpoint is open (no auth needed for low-volume
+requests) and returns JSON, making it a reliable stand-in for a
+third-party API integration.
+
+The function is kept under the name `get_reddit_posts` so existing
+imports in views.py continue to work without changes.
 """
 
+import certifi
 import requests
 
 
-def get_reddit_posts(subreddit="movies"):
-    """Fetch the hot posts from a subreddit's JSON feed.
-
-    Args:
-        subreddit: name of the subreddit (no "r/" prefix).
-
-    Returns:
-        list of dicts with keys 'title', 'author', 'url', or None on error.
+def get_reddit_posts(subreddit="github"):
     """
-    url = f"https://www.reddit.com/r/{subreddit}/.json"
-    headers = {"User-Agent": "DjangoEcommerceApp/1.0"}
+    Fetch recent public GitHub events.
+    """
+    url = "https://api.github.com/events"
+    headers = {
+        "User-Agent": "DjangoEcommerceApp/1.0",
+        "Accept": "application/vnd.github+json",
+    }
 
     try:
-        response = requests.get(url, headers=headers, timeout=10)
+        response = requests.get(
+            url,
+            headers=headers,
+            timeout=10,
+            verify=certifi.where(),
+        )
     except requests.RequestException as exc:
-        print(f"[reddit] network error: {exc}")
+        print(f"[github] network error: {exc}")
         return None
 
     if response.status_code != 200:
-        print(f"[reddit] failed to fetch data: HTTP {response.status_code}")
+        print(f"[github] failed to fetch data: HTTP {response.status_code}")
         return None
 
-    data = response.json()
+    events = response.json()
     posts = []
-    for item in data.get("data", {}).get("children", []):
-        post = item.get("data", {})
+    for event in events[:25]:  # keep it to 25 items
+        actor = event.get("actor", {}).get("login", "unknown")
+        repo = event.get("repo", {}).get("name", "unknown")
+        event_type = event.get("type", "Event")
         posts.append({
-            "title": post.get("title", "(no title)"),
-            "author": post.get("author", "[deleted]"),
-            "url": "https://www.reddit.com" + post.get("permalink", ""),
+            "title": f"{event_type} on {repo}",
+            "author": actor,
+            "url": f"https://github.com/{repo}",
         })
     return posts
