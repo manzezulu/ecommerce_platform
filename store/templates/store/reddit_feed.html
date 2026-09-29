@@ -1,0 +1,20 @@
+{% extends "store/base.html" %}
+{% block title %}Reddit Feed{% endblock %}
+
+{% block content %}
+  <h1>Posts from r/{{ subreddit }}</h1>
+
+  {% if posts %}
+    <ul class="reddit-feed">
+      {% for post in posts %}
+        <li>
+          <strong>{{ post.title }}</strong><br>
+          <small>by {{ post.author }}</small><br>
+          <a href="{{ post.url }}" target="_blank" rel="noopener">View Post</a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No posts available right now.</p>
+  {% endif %}
+{% endblock %}

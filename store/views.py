@@ -11,6 +11,7 @@ Organised by area:
 - Reviews
 - Password reset
 """
+from .functions.reddit import get_reddit_posts
 
 import secrets
 from datetime import datetime, timedelta
@@ -646,3 +647,16 @@ def reset_password(request, token):
     else:
         form = SetNewPasswordForm()
     return render(request, "store/reset_password.html", {"form": form})
+
+# ---------------------------------------------------------------------------
+# Third-party API: Reddit feed (Part 2)
+# ---------------------------------------------------------------------------
+
+
+def reddit_feed(request):
+    """Fetch posts from a subreddit and render them in a template."""
+    posts = get_reddit_posts("movies")  
+    if posts is None:
+        messages.error(request, "Could not fetch posts from Reddit right now.")
+        posts = []
+    return render(request, "store/reddit_feed.html", {"posts": posts, "subreddit": "movies"})

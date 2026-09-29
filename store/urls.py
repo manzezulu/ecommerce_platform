@@ -2,8 +2,19 @@
 from django.urls import path
 
 from . import views
+from . import api_views
 
 urlpatterns = [
+
+    path("api/stores/", api_views.store_list_create, name="api_store_list"),
+    path("api/stores/<int:pk>/", api_views.store_detail, name="api_store_detail"),
+    path("api/stores/<int:store_pk>/products/", api_views.store_products, name="api_store_products"),
+    path("api/products/<int:pk>/", api_views.product_detail, name="api_product_detail"),
+    path("api/products/<int:pk>/reviews", api_views.product_reviews, name="api_product_reviews"),
+    path("api/stores.xml/", api_views.stores_xml, name="api_stores_xml"),
+
+    path("reddit/", views.reddit_feed, name="reddit_feed"),
+    
     # Auth
     path("register/", views.register_user, name="register"),
     path("login/", views.login_user, name="login"),
