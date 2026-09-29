@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "rest_framework",
     "store",
 ]
 
@@ -66,22 +67,22 @@ WSGI_APPLICATION = "ecommerce_platform.wsgi.application"
 # SQLite is used by default. To use MariaDB, comment out the SQLite
 # block below, uncomment the MySQL block, and fill in your credentials.
 
-#DATABASES = {
- #   "default": {
-  #      "ENGINE": "django.db.backends.sqlite3",
-   #     "NAME": BASE_DIR / "db.sqlite3",
-    #}
-#}
 DATABASES = {
-         "default": {
-         "ENGINE": "django.db.backends.mysql",
-         "NAME": "ecommerse_db",
-         "USER": "ecom_user",
-         "PASSWORD": "123Rain@3",
-         "HOST": "127.0.0.1",
-         "PORT": "3306",   # default MySQL/MariaDB port
-     }
- }
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
+    }
+}
+#DATABASES = {
+ #        "default": {
+  #       "ENGINE": "django.db.backends.mysql",
+   #      "NAME": "ecommerse_db",
+    #     "USER": "ecom_user",
+     #    "PASSWORD": "123Rain@3",
+      #   "HOST": "127.0.0.1",
+       #  "PORT": "3306",   # default MySQL/MariaDB port
+     #}
+ #}
 
 
 # --- Password validation -------------------------------------------------
@@ -131,3 +132,19 @@ DEFAULT_FROM_EMAIL = "no-reply@starbridge-market.local"
 LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "product_list"
 LOGOUT_REDIRECT_URL = "login"
+
+#--- Django REST Framework -----------------------------------------------
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.BasicAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.AllowAny",
+    ],
+    "DEFAULT_RENDERER_CLASSES": [
+        "rest_framework.renderers.JSONRenderer",
+        "rest_framework_xml.renderers.XMLRenderer",
+        "rest_framework.renderers.BrowsableAPIRenderer",
+    ],
+}

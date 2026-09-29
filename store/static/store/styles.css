@@ -75,7 +75,7 @@ main {
 
 .btn {
   display: inline-block;
-  padding: 8px 16px;
+  padding: 8px 7px;
   border-radius: 6px;
   border: none;
   background-color: var(--accent);
